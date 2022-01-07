@@ -3,6 +3,7 @@ from flask import request, jsonify
 import cv2
 from tensorflow.keras.models import load_model
 from time import sleep
+from keras.preprocessing import image
 from keras.preprocessing.image import img_to_array
 import numpy as np
 import glob
@@ -82,14 +83,14 @@ def result():
         resp.status_code = 501
         return resp
     
-    image = request.files['image']
+    # image = request.files['image']
 
-    if image.filename == '':
-        resp = jsonify({'msg': "No file image selected"})
-        resp.status_code = 404
-        return resp
+    # if image.filename == '':
+    #     resp = jsonify({'msg': "No file image selected"})
+    #     resp.status_code = 404
+    #     return resp
     error = {}
-    success = False
+    # success = False
 
     images = request.files.getlist('image')
 

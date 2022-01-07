@@ -10,14 +10,12 @@ flask-marshmallow = "*"
 flask-jwt-extended = "*"
 flask-dotenv = "*"
 flask-cors = "*"
-tensorflow-cpu = "==2.3.3"
-marshmallow-sqlalchemy = "*"
-mysqlclient = "*"
 pymysql = "*"
-pandas = "*"
 opencv-python = "*"
 gunicorn = "*"
 flask-assets = "*"
+tensorflow-cpu = "*"
+pandas = "*"
 
 [dev-packages]
 
