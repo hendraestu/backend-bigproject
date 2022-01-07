@@ -4,17 +4,15 @@ from config import Config
 from flask_sqlalchemy import SQLAlchemy
 from flask_assets import Environment
 from flask_jwt_extended import JWTManager
+from flask_cors import CORS
 
 app = Flask(__name__)
 
-# app.config["SQLALCHEMY_DATABASE_URI"] = 'mariadb://root:hendra24@localhost/bigpro'
-# app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-# app.config["SQLALCHEMY_DATABASE_URI"] = 'postgresql://postgres:postgres@localhost/'
-
-db = SQLAlchemy(app)
+app = Flask(__name__)
+cors = CORS(app, resources={r"*": {"origins": "*"}})
 
 app.config.from_object(Config)
-from app.controllers import *
+db = SQLAlchemy(app)
 assets = Environment(app)
 
 jwt = JWTManager(app)
