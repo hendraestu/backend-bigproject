@@ -74,8 +74,8 @@ def load_gambar():
 
 def result():
     ruangan = request.form['ruangan']
-    mata_kuliah = request.form['mata_kuliah']
     kelas = request.form['kelas']
+    mata_kuliah = request.form['mata_kuliah']
     id_dosen = request.form['id_dosen']
 
     if 'image' not in request.files:
@@ -127,7 +127,7 @@ def result():
                 # print(id_dosen)
 
 
-                newHistori = Histori(kelas, biasa, senang, mata_kuliah, ruangan, id_dosen)
+                newHistori = Histori(ruangan, kelas, mata_kuliah, biasa, senang, id_dosen)
                 db.session.add(newHistori)
                 db.session.commit()
 
@@ -144,3 +144,8 @@ def result():
                 error = jsonify(resp)
                 error.status_code = 500
                 return error
+
+def getAllresult():
+    allResult = Histori.query.all()
+    result = historis_schema.dump(allResult)
+    return jsonify({"msg": "Success Get all result", "status": 200, "data": result})

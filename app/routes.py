@@ -38,7 +38,10 @@ def userDetails(id):
     if(request.method == 'PUT'):
         return authController.updateUser(id)
 
-@app.route('/post', methods=['POST'])
+@app.route('/predict', methods=['GET', 'POST'])
 def predict():
-    return predikController.result()
+    if request.method == 'GET':
+        return predikController.getAllresult()
+    else:
+        return predikController.result()
 
