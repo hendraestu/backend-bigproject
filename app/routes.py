@@ -3,6 +3,10 @@ from app import app
 from flask import request
 from app.controllers import predikController, authController, dosenController
 
+@app.route("/")
+def login():
+    return render_template("login.html")
+
 @app.route('/dosen', methods=['GET', 'POST'])
 def dosen():
     if request.method == 'GET':

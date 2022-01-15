@@ -5,6 +5,7 @@ from app.models.userModel import db, Users
 from flask_jwt_extended import *
 import datetime
 from flask import request
+from flask.templating import render_template
 
 ma = Marshmallow(app)
 
