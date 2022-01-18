@@ -1,5 +1,5 @@
 from app import app
-from flask import request, jsonify
+from flask import request, jsonify, render_template, session, redirect
 from flask_marshmallow import Marshmallow
 from app.models.dosenModel import db, Dosen
 
@@ -8,7 +8,7 @@ ma = Marshmallow(app)
 
 class DosenSchema(ma.Schema):
     class Meta:
-        fields = ('id', 'nama_dosen', 'mata_kuliah')
+        fields = ('id', 'nama_dosen', 'nipy', 'mata_kuliah', 'jenis_kelamin')
 
 
 # init schema
@@ -19,9 +19,12 @@ dosensSchema = DosenSchema(many=True)
 
 def createDosen():
     nama_dosen = request.form['nama_dosen']
+    nipy = request.form['nipy']
     mata_kuliah = request.form['mata_kuliah']
+    jenis_kelamin = request.form['jenis_kelamin']
+    
 
-    newsDosen = Dosen(nama_dosen=nama_dosen, mata_kuliah=mata_kuliah)
+    newsDosen = Dosen(nama_dosen=nama_dosen, nipy=nipy, mata_kuliah=mata_kuliah, jenis_kelamin=jenis_kelamin)
 
     db.session.add(newsDosen)
     db.session.commit()
@@ -29,11 +32,16 @@ def createDosen():
     return jsonify({"msg": "success get all dosen", "status": 200, "data": new})
 
 
-def getAlldosen():
+def getAlldosenHistori():
+    if not session.get("name"):
+        # if not there in the session then redirect to the login page
+        return redirect("/masuk")
     allDosen = Dosen.query.all()
-    result = dosensSchema.dump(allDosen)
-    return jsonify({"msg": "Success Get all dosen", "status": 200, "data": result})
+    return render_template('listdosen.html', data=enumerate(allDosen, 1))
 
+def getAllDosenPredik():
+    allDosen = Dosen.query.all()
+    return render_template('predik.html', data=enumerate(allDosen, 1))
 
 def getDosenById(id):
     dosen = Dosen.query.get(id)
@@ -51,7 +59,7 @@ def updateDosen(id):
 
     db.session.commit()
     dosenUpdate = dosenSchema.dump(dosen)
-    return jsonify({"msg": "Success update mitra", "status": 200, "data": dosenUpdate})
+    return jsonify({"msg": "Success update dosen", "status": 200, "data": dosenUpdate})
 
 
 def deleteDosen(id):
@@ -59,4 +67,4 @@ def deleteDosen(id):
     db.session.delete(dosen)
     db.session.commit()
     dosenDelete = dosenSchema.dump(dosen)
-    return jsonify({"msg": "Success Delete mitra", "status": 200, "data": dosenDelete})
+    return jsonify({"msg": "Success Delete dosen", "status": 200, "data": dosenDelete})

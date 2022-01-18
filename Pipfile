@@ -16,6 +16,8 @@ gunicorn = "*"
 flask-assets = "*"
 tensorflow-cpu = "*"
 pandas = "*"
+flask-session = "*"
+nltk = "*"
 
 [dev-packages]
 

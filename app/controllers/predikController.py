@@ -1,5 +1,5 @@
 from app import app
-from flask import request, jsonify
+from flask import redirect, request, jsonify, render_template, session
 import cv2
 from tensorflow.keras.models import load_model
 from time import sleep
@@ -73,6 +73,10 @@ def load_gambar():
     return [cv2.imread(file) for file in glob.glob("images/*")]
 
 def result():
+    if not session.get("name"):
+        # if not there in the session then redirect to the login page
+        return redirect("/masuk")
+
     ruangan = request.form['ruangan']
     kelas = request.form['kelas']
     mata_kuliah = request.form['mata_kuliah']
@@ -83,69 +87,69 @@ def result():
         resp.status_code = 501
         return resp
     
-    # image = request.files['image']
+    image = request.files['image']
 
-    # if image.filename == '':
-    #     resp = jsonify({'msg': "No file image selected"})
-    #     resp.status_code = 404
-    #     return resp
+    if image.filename == '':
+        resp = jsonify({'msg': "No file image selected"})
+        resp.status_code = 404
+        return resp
     error = {}
-    # success = False
+    success = False
 
-    images = request.files.getlist('image')
+    if image and allowed_file(image.filename):
+        filename = secure_filename(image.filename)
+        image.save(os.path.join(app.config['UPLOAD_FOLDER'], image.filename))
+        success = True
+    else:
+        error[image.filename] = "File type is not allowed"
 
-    for image in images:
-        if image and allowed_file(image.filename):
-            filename = secure_filename(image.filename)
-            image.save(os.path.join(app.config['UPLOAD_FOLDER'], image.filename))
-            success = True
-        else:
-            error[image.filename] = "File type is not allowed"
+    if success and error:
+        error['Message'] = "File not uploaded"
+        resp = jsonify(error)
+        resp.status_code = 500
+        return resp
+    if success:
+        try:
+            img = load_gambar()
 
-        if success and error:
-            error['Message'] = "File not uploaded"
-            resp = jsonify(error)
-            resp.status_code = 500
-            return resp
-        if success:
-            try:
-                img = load_gambar()
+            deteksi = predict(img)
+            output= jumlah(deteksi)
+            os.remove(UPLOAD_FOLDER+'/'+filename)
 
-                deteksi = predict(img)
-                output= jumlah(deteksi)
-                os.remove(UPLOAD_FOLDER+'/'+filename)
+            print('ini deteksi', deteksi)
 
-                print('ini deteksi', deteksi)
+            biasa = output[0]
+            senang = output[1]
 
-                biasa = output[0]
-                senang = output[1]
-
-                # print(biasa)
-                # print(senang)
-                # print(ruangan)
-                # print(kelas)
-                # print(id_dosen)
+            # print(biasa)
+            # print(senang)
+            # print(ruangan)
+            # print(kelas)
+            # print(id_dosen)
 
 
-                newHistori = Histori(ruangan, kelas, mata_kuliah, biasa, senang, id_dosen)
-                db.session.add(newHistori)
-                db.session.commit()
+            newHistori = Histori(ruangan, kelas, mata_kuliah, biasa, senang, id_dosen)
+            db.session.add(newHistori)
+            db.session.commit()
 
-                new = histori_schema.dump(newHistori)
-                return jsonify({"msg": "Success post Recomendations", "status": 200, "data": new})
-            except Exception as e:
-                resp = {
+            new = histori_schema.dump(newHistori)
+            return redirect("/listdosen")
+        except Exception as e:
+            resp = {
 
-                    'status': 500,
-                    'msg': "Failed get predict emotion",
-                    'Error': "Image yang masukan bukan wajah"
-                
-                }
-                error = jsonify(resp)
-                error.status_code = 500
-                return error
+                'status': 500,
+                'msg': "Failed get predict emotion",
+                'Error': "Image yang masukan bukan wajah"
+            
+            }
+            error = jsonify(resp)
+            error.status_code = 500
+            return error
 
-def getAllresult():
-    allResult = Histori.query.all()
-    result = historis_schema.dump(allResult)
-    return jsonify({"msg": "Success Get all result", "status": 200, "data": result})
+def getHistoryByDosen(id):
+    if not session.get("name"):
+        # if not there in the session then redirect to the login page
+        return redirect("/masuk")
+    print(id)
+    konten = Histori.query.filter(Histori.id_dosen== id).all()
+    return render_template("riwayat.html", data=enumerate(konten,1))

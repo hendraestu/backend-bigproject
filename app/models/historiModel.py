@@ -1,7 +1,5 @@
 from datetime import datetime
 from app import db
-from app.models.userModel import Users
-from sqlalchemy import ForeignKey
 
 
 class Histori(db.Model):
@@ -12,7 +10,7 @@ class Histori(db.Model):
     tanggal = db.Column(db.Date, nullable=False, default=datetime.utcnow)
     hasilSenang = db.Column(db.String(100))
     hasilBiasa = db.Column(db.String(100))
-    id_dosen = db.Column(db.Integer, ForeignKey(Users.id))
+    id_dosen = db.Column(db.VARCHAR(4))
 
     def __init__(self, ruangan, kelas, mata_kuliah, hasilSenang, hasilBiasa, id_dosen):
         self.ruangan = ruangan

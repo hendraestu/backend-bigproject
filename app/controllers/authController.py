@@ -1,11 +1,10 @@
 from app import app
-from flask import request, jsonify
+from flask import redirect, render_template, request, jsonify,session
 from flask_marshmallow import Marshmallow
 from app.models.userModel import db, Users
 from flask_jwt_extended import *
 import datetime
 from flask import request
-from flask.templating import render_template
 
 ma = Marshmallow(app)
 
@@ -62,17 +61,14 @@ def signIn():
             "msg": "Login Invalid",
             "error": "wrong password"
         })
+    session["name"] =username
     data = singleTransform(user)
     expires = datetime.timedelta(days=1)
     expires_refresh = datetime.timedelta(days=3)
     access_token = create_access_token(data, fresh=True, expires_delta=expires)
     refresh_token = create_refresh_token(data, expires_delta=expires_refresh)
     newData = {**data, "token": access_token, "refresh_token": refresh_token}
-    return jsonify({
-        "msg": "Succes Signin",
-        "status": 200,
-        "data": newData,
-    })
+    return redirect("/")
 
 
 

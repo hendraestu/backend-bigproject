@@ -1,20 +1,14 @@
 from app import db
-from werkzeug.security import generate_password_hash, check_password_hash
 
 class Dosen(db.Model):
     id_dosen = db.Column(db.Integer, primary_key=True)
     nama_dosen = db.Column(db.String(100))
+    nipy =db.Column(db.Integer)
     mata_kuliah = db.Column(db.String(200))
-    username = db.Column(db.String(100), unique=True)
-    password = db.Column(db.Text(100))
+    jenis_kelamin = db.Column(db.String(100))
 
-    def __init__(self, nama_dosen, mata_kuliah, username):
+    def __init__(self, nama_dosen, nipy, mata_kuliah, jenis_kelamin):
         self.nama_dosen = nama_dosen
+        self.nipy = nipy
         self.mata_kuliah = mata_kuliah
-        self.username = username
-
-    def setPassword(self, password):
-        self.password = generate_password_hash(password)
-
-    def checkPassword(self, password):
-        return check_password_hash(self.password, password)
+        self.jenis_kelamin = jenis_kelamin
